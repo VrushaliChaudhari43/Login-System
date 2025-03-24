@@ -24,12 +24,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['file'])) {
         $stmt->execute();
 
         // Success message
-        echo "File uploaded and saved to database successfully.";
+        echo "<div class='alert alert-success' role='alert'>File uploaded and saved to database successfully.</div>";
         // Close the statement
         $stmt->close();
     } else {
         // Error message
-        echo "File upload failed.";
+        echo "<div class='alert alert-danger' role='alert'>File upload failed.</div>";
     }
 }
 ?>
@@ -44,22 +44,28 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['file'])) {
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
 </head>
 <body>
-    <div class="container mt-5">
-        <div class="row justify-content-center">
-            <div class="col-md-6">
-                <form method="POST" enctype="multipart/form-data" class="border p-4 bg-light rounded">
-                    <h2 class="text-center">Upload File</h2>
-                    <div class="form-group">
-                        <input type="file" name="file" class="form-control-file" required>
+    <?php include 'header.php'; ?>
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-3">
+                <?php require 'sidebar.php'; // Include the sidebar file ?>
+            </div>
+            <div class="col-md-9">
+                <div class="row justify-content-center">
+                    <div class="col-md-8">
+                        <form method="POST" enctype="multipart/form-data" class="border p-4 bg-light rounded">
+                            <h2 class="text-center">Upload File</h2>
+                            <div class="form-group">
+                                <input type="file" name="file" class="form-control-file" required>
+                            </div>
+                            <button type="submit" class="btn btn-success btn-block col-lg-2">Upload</button>
+                        </form>
                     </div>
-                    <button type="submit" class="btn btn-success btn-block">Upload</button>
-                </form>
-                <form method="POST" action="logout.php" class="mt-3">
-                    <button type="submit" class="btn btn-danger btn-block" style="background-color: #dc3545; border-color: #dc3545;">Logout</button>
-                </form>
+                </div>
             </div>
         </div>
     </div>
+    <?php include 'footer.php'; ?>
     <!-- Bootstrap JS and dependencies -->
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>

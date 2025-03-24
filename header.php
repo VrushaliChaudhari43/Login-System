@@ -2,6 +2,7 @@
 
 // Check if user is logged in
 $isLoggedIn = isset($_SESSION['user_id']);
+$isAdmin = isset($_SESSION['role']) && $_SESSION['role'] === 'admin';
 
 ?>
 
@@ -29,7 +30,7 @@ $isLoggedIn = isset($_SESSION['user_id']);
                     <ul class="navbar-nav ms-auto">
                         <?php if ($isLoggedIn): ?>
                             <li class="nav-item">
-                                <a class="nav-link" href="dashboard.php">Dashboard</a>
+                                <a class="nav-link" href="<?php echo $isAdmin ? 'admin-dashboard.php' : 'dashboard.php'; ?>">Dashboard</a>
                             </li>
                             <li class="nav-item">
                                 <a class="nav-link" href="logout.php">Logout</a>
