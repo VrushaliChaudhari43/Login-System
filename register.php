@@ -1,4 +1,5 @@
 <?php
+require 'header.php'; // Include the header file
 require 'db.php';
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
@@ -8,19 +9,31 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $email = filter_var(trim($_POST['email']), FILTER_SANITIZE_EMAIL);
     $password = password_hash(trim($_POST['password']), PASSWORD_BCRYPT); // Hash the password
 
-    // Prepare an SQL statement to insert the new user into the database
-    $stmt = $conn->prepare("INSERT INTO users (username, email, password) VALUES (?, ?, ?)");
-    $stmt->bind_param("sss", $username, $email, $password); // Bind parameters
+    // Check if the username already exists
+    $checkUserStmt = $conn->prepare("SELECT id FROM users WHERE username = ?");
+    $checkUserStmt->bind_param("s", $username);
+    $checkUserStmt->execute();
+    $checkUserStmt->store_result();
 
-    // Execute the statement and check for success
-    if ($stmt->execute()) {
-        echo "Registration successful! <a href='login.php'>Login here</a>";
-    } else {
-        echo "Error: " . $stmt->error;
+    if ($checkUserStmt->num_rows > 0) {
+        echo "<div class='alert alert-danger' role='alert'>Username already exists. Please choose a different username.</div>";
+        $checkUserStmt->close();
+    }else{
+        // Prepare an SQL statement to insert the new user into the database
+        $stmt = $conn->prepare("INSERT INTO users (username, email, password) VALUES (?, ?, ?)");
+        $stmt->bind_param("sss", $username, $email, $password); // Bind parameters
+
+        // Execute the statement and check for success
+        if ($stmt->execute()) {
+            echo '<div class="alert alert-danger text-center" role="alert">Registration successful! <a href="login.php" class="alert-link">Login here</a></div>';
+        } else {
+            echo "<div class='alert alert-danger' role='alert'>Error: " . $stmt->error . "</div>";
+        }
+            $stmt->close();
+
     }
 
     // Close the statement
-    $stmt->close();
 }
 ?>
 
@@ -36,7 +49,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <div class="container">
         <div class="row justify-content-center">
             <div class="col-md-6">
-                <form method="post" class="mt-5 p-4 border rounded bg-light">
+                <form method="post" class="mt-5 p-4 border rounded bg-light" onsubmit="return validateForm()">
                     <h2 class="text-center mb-4">Register</h2>
                     <div class="form-group">
                         <label for="fullname">Full Name</label>
@@ -48,11 +61,15 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     </div>
                     <div class="form-group">
                         <label for="email">Email</label>
-                        <input type="email" id="email" name="email" class="form-control" placeholder="Email" required>
+                        <input type="email" id="email" name="email" class="form-control" placeholder="Email" >
                     </div>
                     <div class="form-group">
                         <label for="password">Password</label>
-                        <input type="password" id="password" name="password" class="form-control" placeholder="Password" required>
+                        <input type="password" id="password" name="password" class="form-control" placeholder="Password" >
+                    </div>
+                    <div class="form-group">
+                        <label for="confirm_password">Confirm Password</label>
+                        <input type="password" id="confirm_password" name="confirm_password" class="form-control" placeholder="Confirm Password" >
                     </div>
                     <button type="submit" class="btn btn-success btn-block">Register</button>
                     <a href="login.php" class="d-block text-center mt-3 text-success">Already have an account? Login here</a>
@@ -63,5 +80,52 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script>
+        function validateForm() {
+            var fullname = document.getElementById('fullname').value;
+            var username = document.getElementById('username').value;
+            var email = document.getElementById('email').value;
+            var password = document.getElementById('password').value;
+
+            if (fullname == "" || username == "" || email == "" || password == "" || confirmPassword == "") {
+                alert("All fields must be filled out");
+                if (fullname == "") {
+                    document.getElementById('fullname').focus();
+                } else if (username == "") {
+                    document.getElementById('username').focus();
+                } else if (email == "") {
+                    document.getElementById('email').focus();
+                } else if (password == "") {
+                    document.getElementById('password').focus();
+                } else if (confirmPassword == "") {
+                    document.getElementById('confirm_password').focus();
+                }
+                return false;
+            }
+
+            var emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailPattern.test(email)) {
+                alert("Please enter a valid email address");
+                return false;
+            }
+
+            if (password.length < 6) {
+                alert("Password must be at least 6 characters long");
+                return false;
+            }
+
+            var confirmPassword = document.getElementById('confirm_password').value;
+            if (password !== confirmPassword) {
+                alert("Passwords do not match");
+                return false;
+            }
+
+            return true;
+        }
+    </script>
+
+<?php
+require 'footer.php'; // Include the footer file
+?>
 </body>
 </html>

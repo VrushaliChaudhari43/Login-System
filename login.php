@@ -1,4 +1,5 @@
 <?php
+require 'header.php'; // Include the header file
 require 'db.php';
 session_start();
 
@@ -12,9 +13,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $stmt->bind_param("s", $username);
     $stmt->execute();
     $stmt->store_result();
-// Bind the result variables to the prepared statement. 
-// This will store the result of the query into the variables $id, $username, and $hashed_password. 
-   $stmt->bind_result($id, $username, $hashed_password);
+    // Bind the result variables to the prepared statement. 
+    // This will store the result of the query into the variables $id, $username, and $hashed_password. 
+    $stmt->bind_result($id, $username, $hashed_password);
     $stmt->fetch();
 
     // Check if user exists and verify the password
@@ -26,7 +27,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         header("Location: dashboard.php");
     } else {
         // Display error message for invalid login
-        echo "Invalid username or password.";
+        echo '<div class="alert alert-danger text-center" role="alert">Invalid username or password.</div>';
     }
 
     // Close the statement
@@ -59,3 +60,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+<?php
+require 'footer.php'; // Include the footer file
+?>
